@@ -1,0 +1,274 @@
+{
+  "nome": "Topologia de referencia - Projeto 1",
+  "redes": [
+    {
+      "id": "Rede A",
+      "prefixo": "10.0.1.0/24"
+    },
+    {
+      "id": "Rede B",
+      "prefixo": "10.0.2.0/24"
+    },
+    {
+      "id": "Rede C",
+      "prefixo": "10.0.3.0/24"
+    }
+  ],
+  "dispositivos": {
+    "H1": {
+      "tipo": "host",
+      "posicao": [
+        80,
+        125
+      ],
+      "interfaces": {
+        "eth0": {
+          "ip": "10.0.1.10",
+          "mac": "AA:00:00:00:01:0A",
+          "rede": "Rede A"
+        }
+      }
+    },
+    "H2": {
+      "tipo": "host",
+      "posicao": [
+        80,
+        220
+      ],
+      "interfaces": {
+        "eth0": {
+          "ip": "10.0.1.11",
+          "mac": "AA:00:00:00:01:0B",
+          "rede": "Rede A"
+        }
+      }
+    },
+    "H3": {
+      "tipo": "host",
+      "posicao": [
+        540,
+        235
+      ],
+      "interfaces": {
+        "eth0": {
+          "ip": "10.0.2.10",
+          "mac": "AA:00:00:00:02:0A",
+          "rede": "Rede B"
+        }
+      }
+    },
+    "H4": {
+      "tipo": "host",
+      "posicao": [
+        920,
+        125
+      ],
+      "interfaces": {
+        "eth0": {
+          "ip": "10.0.3.10",
+          "mac": "AA:00:00:00:03:0A",
+          "rede": "Rede C"
+        }
+      }
+    },
+    "H5": {
+      "tipo": "host",
+      "posicao": [
+        920,
+        220
+      ],
+      "interfaces": {
+        "eth0": {
+          "ip": "10.0.3.11",
+          "mac": "AA:00:00:00:03:0B",
+          "rede": "Rede C"
+        }
+      }
+    },
+    "R1": {
+      "tipo": "router",
+      "posicao": [
+        285,
+        170
+      ],
+      "interfaces": {
+        "e0": {
+          "ip": "10.0.1.1",
+          "mac": "BB:00:00:00:01:00",
+          "rede": "Rede A"
+        },
+        "e1": {
+          "ip": "10.0.14.1",
+          "mac": "BB:00:00:00:01:01",
+          "para": "R4"
+        },
+        "e2": {
+          "ip": "10.0.12.1",
+          "mac": "BB:00:00:00:01:02",
+          "para": "R2"
+        }
+      }
+    },
+    "R2": {
+      "tipo": "router",
+      "posicao": [
+        500,
+        310
+      ],
+      "interfaces": {
+        "e0": {
+          "ip": "10.0.12.2",
+          "mac": "BB:00:00:00:02:00",
+          "para": "R1"
+        },
+        "e1": {
+          "ip": "10.0.23.2",
+          "mac": "BB:00:00:00:02:01",
+          "para": "R3"
+        },
+        "e2": {
+          "ip": "10.0.2.1",
+          "mac": "BB:00:00:00:02:02",
+          "rede": "Rede B"
+        }
+      }
+    },
+    "R3": {
+      "tipo": "router",
+      "posicao": [
+        720,
+        170
+      ],
+      "interfaces": {
+        "e0": {
+          "ip": "10.0.34.3",
+          "mac": "BB:00:00:00:03:00",
+          "para": "R4"
+        },
+        "e1": {
+          "ip": "10.0.23.3",
+          "mac": "BB:00:00:00:03:01",
+          "para": "R2"
+        },
+        "e2": {
+          "ip": "10.0.3.1",
+          "mac": "BB:00:00:00:03:02",
+          "rede": "Rede C"
+        }
+      }
+    },
+    "R4": {
+      "tipo": "router",
+      "posicao": [
+        500,
+        80
+      ],
+      "interfaces": {
+        "e0": {
+          "ip": "10.0.14.4",
+          "mac": "BB:00:00:00:04:00",
+          "para": "R1"
+        },
+        "e1": {
+          "ip": "10.0.34.4",
+          "mac": "BB:00:00:00:04:01",
+          "para": "R3"
+        }
+      }
+    }
+  },
+  "enlaces": [
+    {
+      "a": "H1",
+      "ia": "eth0",
+      "b": "R1",
+      "ib": "e0",
+      "custo": 0,
+      "tipo": "lan"
+    },
+    {
+      "a": "H2",
+      "ia": "eth0",
+      "b": "R1",
+      "ib": "e0",
+      "custo": 0,
+      "tipo": "lan"
+    },
+    {
+      "a": "H3",
+      "ia": "eth0",
+      "b": "R2",
+      "ib": "e2",
+      "custo": 0,
+      "tipo": "lan"
+    },
+    {
+      "a": "H4",
+      "ia": "eth0",
+      "b": "R3",
+      "ib": "e2",
+      "custo": 0,
+      "tipo": "lan"
+    },
+    {
+      "a": "H5",
+      "ia": "eth0",
+      "b": "R3",
+      "ib": "e2",
+      "custo": 0,
+      "tipo": "lan"
+    },
+    {
+      "a": "R1",
+      "ia": "e1",
+      "b": "R4",
+      "ib": "e0",
+      "custo": 1,
+      "tipo": "wan"
+    },
+    {
+      "a": "R4",
+      "ia": "e1",
+      "b": "R3",
+      "ib": "e0",
+      "custo": 1,
+      "tipo": "wan"
+    },
+    {
+      "a": "R1",
+      "ia": "e2",
+      "b": "R2",
+      "ib": "e0",
+      "custo": 2,
+      "tipo": "wan"
+    },
+    {
+      "a": "R2",
+      "ia": "e1",
+      "b": "R3",
+      "ib": "e1",
+      "custo": 1,
+      "tipo": "wan"
+    }
+  ],
+  "processos": {
+    "navegador": {
+      "porta_padrao": 5210
+    },
+    "navegador2": {
+      "porta_padrao": 5211
+    },
+    "servidorWeb": {
+      "porta_padrao": 443
+    }
+  },
+  "parametros": {
+    "cabecalho_sessao": 4,
+    "cabecalho_transporte": 8,
+    "cabecalho_rede": 20,
+    "cabecalho_enlace": 14,
+    "finalizador_enlace": 4,
+    "limiar_segmentacao": 64,
+    "carga_maxima_segmento": 40
+  }
+}
