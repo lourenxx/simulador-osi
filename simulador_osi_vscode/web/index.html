@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador do Modelo OSI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1>Simulador do Modelo OSI</h1>
+    <p>Comunicação de Dados - Projeto 1</p>
+  </div>
+  <div class="top-actions">
+    <span id="serverStatus" class="status ok">servidor local ativo</span>
+    <button id="shutdownBtn" class="ghost danger">Encerrar servidor</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel controls-panel">
+    <div class="control-grid">
+      <label>
+        <span>Cenário</span>
+        <select id="scenario"></select>
+      </label>
+      <label class="grow2">
+        <span>Mensagem</span>
+        <input id="message" type="text" autocomplete="off" />
+      </label>
+      <label>
+        <span>Visualização</span>
+        <select id="stackMode">
+          <option value="osi">OSI - 7 camadas</option>
+          <option value="tcpip">TCP/IP - 5 camadas</option>
+        </select>
+      </label>
+      <label>
+        <span>Velocidade</span>
+        <select id="speed">
+          <option value="1200">Lenta</option>
+          <option value="650" selected>Normal</option>
+          <option value="250">Rápida</option>
+        </select>
+      </label>
+    </div>
+    <div class="scenario-info">
+      <div>
+        <strong id="scenarioTitle">-</strong>
+        <span id="scenarioDescription">-</span>
+      </div>
+      <div class="scenario-badges">
+        <span id="messageBytes" class="badge">0 B úteis</span>
+        <span id="scenarioHint" class="badge subtle"></span>
+      </div>
+    </div>
+    <div class="endpoint-strip">
+      <div><span>Origem</span><strong id="originValue">-</strong></div>
+      <div><span>Processo / porta</span><strong id="sourceProcessValue">-</strong></div>
+      <div><span>Destino</span><strong id="destinationValue">-</strong></div>
+      <div><span>Processo / porta</span><strong id="destinationProcessValue">-</strong></div>
+    </div>
+    <div class="button-row">
+      <button id="loadBtn">Carregar cenário</button>
+      <button id="stepBtn" class="secondary">Passo</button>
+      <button id="playBtn" class="secondary">Executar</button>
+      <button id="pauseBtn" class="secondary">Pausar</button>
+      <button id="resetBtn" class="ghost">Reiniciar</button>
+      <button id="saveLogBtn" class="ghost">Salvar registro</button>
+      <span class="button-separator"></span>
+      <button id="failLinkBtn" class="ghost danger-text">Derrubar R1-R4</button>
+      <button id="bitErrorBtn" class="ghost danger-text">Injetar erro R4-R3</button>
+      <button id="unreachableBtn" class="ghost danger-text">Destino inalcançável</button>
+    </div>
+    <div id="errorBox" class="error-box hidden"></div>
+  </section>
+
+  <section class="panel map-panel">
+    <div class="section-title">
+      <div>
+        <h2>Mapa da rede</h2>
+        <p>Todos os dispositivos, enlaces, interfaces e custos são lidos de <code>topologia.json</code>.</p>
+      </div>
+      <div id="pathSummary" class="path-summary">Caminho: -</div>
+    </div>
+    <div class="map-wrap">
+      <svg id="networkMap" viewBox="0 0 1000 390" role="img" aria-label="Mapa da topologia"></svg>
+    </div>
+  </section>
+
+  <section class="workspace-grid">
+    <section class="panel stacks-panel">
+      <div class="section-title">
+        <div>
+          <h2>Pilhas dos dispositivos envolvidos</h2>
+          <p>A camada ativa é destacada a cada evento.</p>
+        </div>
+        <span id="currentStep" class="badge">Passo 0/0</span>
+      </div>
+      <div id="stacks" class="stacks"></div>
+    </section>
+
+    <section class="panel pdu-panel">
+      <div class="section-title">
+        <div>
+          <h2>Unidade de dados atual</h2>
+          <p id="pduName">Nenhuma unidade carregada.</p>
+        </div>
+      </div>
+      <div id="pduBlocks" class="pdu-blocks empty-state">Carregue um cenário e avance os passos.</div>
+      <div class="address-grid">
+        <div class="address-card logical">
+          <span>Endereços lógicos - L3</span>
+          <strong id="logicalPair">-</strong>
+          <small>Permanece de origem a destino.</small>
+        </div>
+        <div class="address-card physical">
+          <span>Endereços físicos - L2</span>
+          <strong id="physicalPair">-</strong>
+          <small>Muda em cada salto.</small>
+        </div>
+      </div>
+      <div id="eventDetail" class="event-detail">-</div>
+    </section>
+  </section>
+
+  <section class="bottom-grid">
+    <section class="panel log-panel">
+      <div class="section-title">
+        <div>
+          <h2>Registro de eventos</h2>
+          <p>Formato: passo | dispositivo | camada | ação | descrição tamanho.</p>
+        </div>
+      </div>
+      <pre id="logArea" class="log-area"></pre>
+    </section>
+
+    <section class="panel summary-panel">
+      <div class="section-title">
+        <div>
+          <h2>Quadro numérico</h2>
+          <p>Eficiência = dados úteis / octetos transmitidos.</p>
+        </div>
+      </div>
+      <div class="metrics">
+        <div><span>Dados úteis</span><strong id="metricUseful">-</strong></div>
+        <div><span>Transmitidos</span><strong id="metricTx">-</strong></div>
+        <div><span>Eficiência</span><strong id="metricEfficiency">-</strong></div>
+        <div><span>Sobrecarga</span><strong id="metricOverhead">-</strong></div>
+      </div>
+      <h3>Comparação obrigatória C1 × C2</h3>
+      <table class="comparison-table">
+        <thead><tr><th>Caso</th><th>Transmitido</th><th>Eficiência</th></tr></thead>
+        <tbody>
+          <tr><td>C1 - 1 enlace</td><td id="c1Tx">-</td><td id="c1Eff">-</td></tr>
+          <tr><td>C2 - 4 enlaces</td><td id="c2Tx">-</td><td id="c2Eff">-</td></tr>
+        </tbody>
+      </table>
+      <div id="resultNote" class="result-note">-</div>
+    </section>
+  </section>
+
+  <section class="panel routing-panel">
+    <div class="section-title">
+      <div>
+        <h2>Tabelas de encaminhamento</h2>
+        <p>Calculadas pelo núcleo a partir dos custos do arquivo externo de topologia.</p>
+      </div>
+    </div>
+    <div id="routingTables" class="routing-tables"></div>
+  </section>
+</main>
+
+<footer>
+  Simulador educacional do modelo OSI - execução local, sem dependências externas.
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

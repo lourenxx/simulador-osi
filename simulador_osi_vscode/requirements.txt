@@ -1,0 +1,2 @@
+# O projeto não possui dependências externas.
+# Requer Python 3.10 ou superior.
